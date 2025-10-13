@@ -1,0 +1,145 @@
+// src/App.jsx
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+
+export default function InteractiveQuizApp() {
+  const questions = [
+    {
+      question: "Which language runs in a web browser?",
+      options: ["Java", "C", "Python", "JavaScript"],
+      correct: 3,
+    },
+    {
+      question: "What does CSS stand for?",
+      options: [
+        "Central Style Sheets",
+        "Cascading Style Sheets",
+        "Cascading Simple Sheets",
+        "Cars SUVs Sailboats",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Which is not a JavaScript framework?",
+      options: ["React", "Angular", "Vue", "Django"],
+      correct: 3,
+    },
+    {
+      question: "Inside which HTML element do we put JavaScript?",
+      options: ["<js>", "<script>", "<javascript>", "<code>"],
+      correct: 1,
+    },
+  ];
+
+  const [current, setCurrent] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+  const [start, setStart] = useState(false);
+
+  const handleAnswer = (index) => {
+    setSelected(index);
+  };
+
+  const nextQuestion = () => {
+    if (selected === questions[current].correct) {
+      setScore(score + 1);
+    }
+    setSelected(null);
+    if (current + 1 < questions.length) {
+      setCurrent(current + 1);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  const restartQuiz = () => {
+    setCurrent(0);
+    setScore(0);
+    setSelected(null);
+    setShowResult(false);
+    setStart(false);
+  };
+
+  if (!start) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-indigo-900 via-purple-800 to-indigo-700 text-white p-4">
+        <motion.h1
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="text-4xl font-bold mb-6"
+        >
+          🧠 Interactive Quiz App
+        </motion.h1>
+        <Button
+          onClick={() => setStart(true)}
+          className="bg-purple-500 hover:bg-purple-700 px-6 py-2 text-lg rounded-lg"
+        >
+          Start Quiz
+        </Button>
+      </div>
+    );
+  }
+
+  if (showResult) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-indigo-900 via-purple-800 to-indigo-700 text-white p-4">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="text-3xl font-bold mb-4"
+        >
+          🎉 Quiz Completed!
+        </motion.h2>
+        <p className="text-xl mb-6">
+          Your Score: <span className="font-bold">{score}</span> / {questions.length}
+        </p>
+        <Button
+          onClick={restartQuiz}
+          className="bg-purple-500 hover:bg-purple-700 px-6 py-2 rounded-lg"
+        >
+          Restart Quiz
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-indigo-900 via-purple-800 to-indigo-700 text-white p-4">
+      <div className="max-w-lg w-full bg-white/10 p-6 rounded-2xl shadow-lg backdrop-blur">
+        <h2 className="text-2xl mb-4 font-bold">
+          Question {current + 1}/{questions.length}
+        </h2>
+        <p className="text-lg mb-6">{questions[current].question}</p>
+        <div className="grid grid-cols-1 gap-3">
+          {questions[current].options.map((option, index) => (
+            <motion.button
+              key={index}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleAnswer(index)}
+              className={`px-4 py-2 rounded-lg text-left ${
+                selected === index
+                  ? "bg-purple-600 text-white"
+                  : "bg-white/20 hover:bg-white/30"
+              }`}
+            >
+              {option}
+            </motion.button>
+          ))}
+        </div>
+        <div className="mt-6 text-right">
+          <Button
+            onClick={nextQuestion}
+            disabled={selected === null}
+            className="bg-purple-500 hover:bg-purple-700 px-6 py-2 rounded-lg"
+          >
+            {current + 1 === questions.length ? "Finish" : "Next"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
